@@ -1,0 +1,20 @@
+{
+	"remoteAPI" : {
+		"address": "127.0.0.1",
+		"port": 19999,
+		"timeout": 5000
+	},
+	"motorSpeed": 2,
+	"leftMotor": "Pioneer_p3dx_leftMotor",
+	"rightMotor": "Pioneer_p3dx_rightMotor",
+	"visionSensors": [
+		"Vision_sensor",
+		"Vision_sensor0",
+		"Vision_sensor1"	
+	],
+	"proximitySensors": [
+		"Proximity_sensor_left",
+		"Proximity_sensor_middle",
+		"Proximity_sensor_right"
+	]
+}
