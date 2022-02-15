@@ -89,19 +89,98 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     # --------------------
+    # Get Proximity Sensors
+    # --------------------
+
+    proximitySensor = [None] * len(config["visionSensors"])    
+
+    for idx in range(len(config["proximitySensors"])):
+        print("Loading sensor [{}]:{}".format(idx, config["proximitySensors"][idx]))
+        res, sensor = sim.simxGetObjectHandle(
+                clientID, 
+                config["proximitySensors"][idx], 
+                sim.simx_opmode_blocking)
+
+        if res != sim.simx_return_ok:
+            print("Failed to find proximity sensor {}".format(idx))
+            sys.exit(-1)
+
+        proximitySensor[idx] = sensor
+
+    # --------------------
+    # Get Vision Sensors
+    # --------------------
+
+    visionSensor = [None] * len(config["visionSensors"])    
+
+    for idx in range(len(config["visionSensors"])):
+        print("Loading sensor [{}]:{}".format(idx, config["visionSensors"][idx]))
+        res, sensor = sim.simxGetObjectHandle(
+                clientID, 
+                config["visionSensors"][idx], 
+                sim.simx_opmode_blocking)
+
+        if res != sim.simx_return_ok:
+            print("Failed to find vision sensor {}".format(idx))
+            sys.exit(-1)
+
+        visionSensor[idx] = sensor
+
+    # --------------------
     # Main Loop
     # --------------------
 
-    sim.simxSetJointTargetVelocity(
-            clientID, 
-            leftMotor, 
-            config["motorSpeed"], 
-            sim.simx_opmode_blocking)
-    sim.simxSetJointTargetVelocity(
-            clientID, 
-            rightMotor, 
-            config["motorSpeed"]/2, 
-            sim.simx_opmode_blocking)
-    time.sleep(0.1)
+    while (True):
+        leftSpeed = config["motorSpeed"]
+        rightSpeed = config["motorSpeed"]
 
+        leftVisionResult = sim.simxReadVisionSensor(
+            clientID, 
+            visionSensor[1], 
+            sim.simx_opmode_blocking)
+
+        rightVisionResult = sim.simxReadVisionSensor(
+            clientID, 
+            visionSensor[0], 
+            sim.simx_opmode_blocking)
+
+        leftProximityResult = sim.simxReadProximitySensor(
+            clientID, 
+            proximitySensor[2], 
+            sim.simx_opmode_blocking)
+
+        middleProximityResult = sim.simxReadProximitySensor(
+            clientID, 
+            proximitySensor[1], 
+            sim.simx_opmode_blocking)
+
+        rightProximityResult = sim.simxReadProximitySensor(
+            clientID, 
+            proximitySensor[0], 
+            sim.simx_opmode_blocking)
+
+        print(leftProximityResult)
+        print(middleProximityResult)
+        print(rightProximityResult)
+
+        if (leftVisionResult[2][0][11] < 0.3 or leftProximityResult[2][0] > 0.3 or middleProximityResult[2][0] > 0.3):
+            leftSpeed = 0
+            # rightSpeed = 0
+        elif (rightVisionResult[2][0][11] < 0.3 or rightProximityResult[2][0] > 0.3):
+            # leftSpeed = 0
+            rightSpeed = 0
+
+
+        sim.simxSetJointTargetVelocity(
+                clientID, 
+                leftMotor, 
+                leftSpeed,
+                sim.simx_opmode_blocking)
+        sim.simxSetJointTargetVelocity(
+                clientID, 
+                rightMotor, 
+                rightSpeed,
+                sim.simx_opmode_blocking)
+        time.sleep(0.1)
+    
     sim.simxFinish(clientID)    

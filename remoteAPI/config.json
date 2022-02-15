@@ -7,7 +7,14 @@
 	"motorSpeed": 2,
 	"leftMotor": "Pioneer_p3dx_leftMotor",
 	"rightMotor": "Pioneer_p3dx_rightMotor",
-	"sensors": [
-
+	"visionSensors": [
+		"Vision_sensor",
+		"Vision_sensor0",
+		"Vision_sensor1"	
+	],
+	"proximitySensors": [
+		"Proximity_sensor_left",
+		"Proximity_sensor_middle",
+		"Proximity_sensor_right"
 	]
 }
